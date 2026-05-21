@@ -2,8 +2,8 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-import requests
-from io import BytesIO
+import gdown
+import os
 
 # ==============================================================================
 # 1. ตั้งค่าหน้าเว็บสไตล์แอปพลิเคชันทางการแพทย์
@@ -19,37 +19,41 @@ st.subheader("ระบบปัญญาประดิษฐ์จำแนก
 st.markdown("---")
 
 # ==============================================================================
-# 2. ฟังก์ชันโหลดโมเดลจาก Google Drive 
+# 2. ฟังก์ชันดาวน์โหลดและโหลดโมเดลด้วย gdown (ทะลวงบล็อกไฟล์ใหญ่)
 # ==============================================================================
 @st.cache_resource
 def load_models():
-    # ✨ แก้ไขแล้ว: ใส่เฉพาะ File ID ที่แกะออกมาจากลิงก์ของคุณเรียบร้อยแล้วครับ
+    # ใช้วิธีการแกะ File ID จาก Google Drive ของคุณเหมือนเดิมเป๊ะครับ
     shape_id = '19xrNgp3STE2jx9odn-lAR1NSpMoFh2lm'
     color_id = '1XmLffNESJMIJ6kgtqLQlAXE5BTtf6r0w'
     
-   # 🔄 เปลี่ยนวิธีสร้าง URL โหลดไฟล์ใหม่ (ก๊อปปี้ไปวางทับบรรทัด url_shape และ url_color ของเก่าได้เลย)
-    url_shape = f'https://drive.google.com/uc?id={shape_id}&export=download'
-    url_color = f'https://drive.google.com/uc?id={color_id}&export=download'
+    # กำหนดชื่อไฟล์ปลายทางที่จะเซฟในเซิร์ฟเวอร์ Streamlit
+    shape_path = 'bacterial_shape_model_v3_balanced.h5'
+    color_path = 'bacterial_color_model_v3_balanced.h5'
     
-    # ดาวน์โหลดโมเดลรูปร่าง
-    response_shape = requests.get(url_shape)
-    shape_model_file = BytesIO(response_shape.content)
-    model_shape = tf.keras.models.load_model(shape_model_file)
-    
-    # ดาวน์โหลดโมเดลสีแกรม
-    response_color = requests.get(url_color)
-    color_model_file = BytesIO(response_color.content)
-    model_color = tf.keras.models.load_model(color_model_file)
+    # 🚀 ตรวจสอบและดาวน์โหลดโมเดลรูปร่าง (ถ้ายังไม่มีในระบบ)
+    if not os.path.exists(shape_path):
+        url_shape = f'https://drive.google.com/uc?id={shape_id}'
+        gdown.download(url_shape, shape_path, quiet=True)
+        
+    # 🚀 ตรวจสอบและดาวน์โหลดโมเดลสีแกรม (ถ้ายังไม่มีในระบบ)
+    if not os.path.exists(color_path):
+        url_color = f'https://drive.google.com/uc?id={color_id}'
+        gdown.download(url_color, color_path, quiet=True)
+        
+    # โหลดโมเดลเข้าสู่ระบบ TensorFlow
+    model_shape = tf.keras.models.load_model(shape_path)
+    model_color = tf.keras.models.load_model(color_path)
     
     return model_shape, model_color
 
 # พยายามโหลดโมเดลและแจ้งสถานะบนหน้าเว็บ
 try:
-    with st.spinner("🔄 กำลังเชื่อมต่อระบบและโหลดโมเดลอัจฉริยะ (อาจใช้เวลาสักครู่)..."):
+    with st.spinner("🔄 ระบบกำลังใช้พลังทะลวงดาวน์โหลดโมเดลขนาดใหญ่จาก Google Drive (ครั้งแรกอาจใช้เวลา 1-2 นาที)..."):
         model_shape, model_color = load_models()
-    st.success("✅ โหลดโมเดล BacWise v3 เรียบร้อยแล้ว! ระบบพร้อมวิเคราะห์")
+    st.success("✅ โหลดโมเดล BacWise v3 ผ่านการดึงไฟล์ใหญ่เรียบร้อยแล้ว! ระบบพร้อมวิเคราะห์")
 except Exception as e:
-    st.error("❌ ไม่สามารถโหลดโมเดลได้ โปรดตรวจสอบสิทธิ์การแชร์ลิงก์ของไฟล์ .h5 บน Google Drive ให้เป็น 'ทุกคนที่มีลิงก์' (Anyone with the link)")
+    st.error("❌ ดึงข้อมูลล้มเหลว โปรดตรวจสอบสิทธิ์การแชร์ลิงก์ใน Google Drive ให้เป็น 'Anyone with the link' หรือลองกดรันแอปใหม่อีกครั้ง")
 
 # รายชื่อคลาสสัณฐานวิทยา (ตามลำดับการเทรน)
 shape_labels = ['Bacilli', 'Cocci', 'Spirals']
@@ -63,18 +67,14 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
-    # เปิดและแสดงภาพถ่ายบนหน้าเว็บ
     image_display = Image.open(uploaded_file)
     st.image(image_display, caption="🖼️ ภาพถ่ายแบคทีเรียที่นำเข้าสู่ระบบ", use_container_width=True)
     
-    # ปุ่มกดสั่งเริ่มประมวลผล
     if st.button("🔬 เริ่มทำการวิเคราะห์ทางจุลชีววิทยา"):
         
-        # --- เตรียมภาพให้พร้อมสำหรับโครงสร้าง VGG16 (224x224) ---
         img_resized = image_display.resize((224, 224))
         img_array = np.array(img_resized) / 255.0
         
-        # ป้องกัน Error หากภาพอัปโหลดไม่มี 3 แชนเนลสี (RGB)
         if len(img_array.shape) == 2:
             img_array = np.stack((img_array,)*3, axis=-1)
         elif img_array.shape[2] == 4:
@@ -85,8 +85,6 @@ if uploaded_file is not None:
         # ==============================================================================
         # 4. ภาคประมวลผลร่วมกับระบบ Quality Control (Threshold ดักภาพไม่ชัด)
         # ==============================================================================
-        
-        # ตั้งเกณฑ์ความมั่นใจขั้นต่ำ (%) ตามพฤติกรรมโมเดล v3 ที่เราเทรนมา
         THRESHOLD_SHAPE = 0.65  
         THRESHOLD_COLOR = 0.80  
 
@@ -110,15 +108,14 @@ if uploaded_file is not None:
         pred_color = model_color.predict(img_tensor)
         raw_color_val = pred_color[0][0]
         
-        # แปลงค่าความน่าจะเป็นของโมเดลสี (Binary Classification)
         if raw_color_val > 0.5:
             res_color = "Gram-Positive Bacteria (ติดสีม่วง)"
             conf_color = raw_color_val
-            color_theme = "#8A2BE2"  # ใช้เฉดสีม่วงสุภาพบนหน้าเว็บ
+            color_theme = "#8A2BE2"  
         else:
             res_color = "Gram-Negative Bacteria (ติดสีชมพู/แดง)"
             conf_color = 1 - raw_color_val
-            color_theme = "#FF69B4"  # ใช้เฉดสีชมพูบนหน้าเว็บ
+            color_theme = "#FF69B4"  
             
         if conf_color < THRESHOLD_COLOR:
             st.error("🎨 **ข้อจำกัดในการจำแนกประเภทสีย้อมแกรม**")
@@ -129,7 +126,7 @@ if uploaded_file is not None:
             st.caption(f"ดัชนีความมั่นใจของ AI: {conf_color*100:.2f}%")
 
 # ==============================================================================
-# 5. ฟุตเตอร์ลิขสิทธิ์ (ปลอดภัยและเป็นทางการ)
+# 5. ฟุตเตอร์ลิขสิทธิ์
 # ==============================================================================
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: gray;'>© 2026 BacWise Project. All Rights Reserved. (Private Repository Protected)</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: gray;'>© 2026 BacWise Project. All Rights Reserved. (Private Repository Protected)</p>", unsafe_allow_html=True)cWise Project. All Rights Reserved. (Private Repository Protected)</p>", unsafe_allow_html=True)
