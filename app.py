@@ -6,7 +6,7 @@ import gdown
 import os
 
 # ==============================================================================
-# 1. ตั้งค่าหน้าเว็บและปรับแต่งหน้าตา (Dark Mode & Font Style)
+# 1. ตั้งค่าหน้าเว็บและปรับแต่งหน้าตา (Dark Mode & Advanced Layout)
 # ==============================================================================
 st.set_page_config(
     page_title="BacWise - Bacterial Classification",
@@ -14,38 +14,46 @@ st.set_page_config(
     layout="centered"
 )
 
-# 🎨 จัดการ CSS เปลี่ยนหน้าเว็บเป็นสีดำ และแก้บั๊กข้อความซ้อนทับ
+# 🎨 จัดการ CSS แบบเจาะลึกเพื่อแก้ปัญหาตัวหนังสือซ้อนทับตรงส่วนอัปโหลดโดยเฉพาะ
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
     
-    /* 1. เปลี่ยนพื้นหลังของแอปทั้งหมดเป็นสีดำ/เทาเข้ม และเปลี่ยนสีตัวอักษรหลักเป็นสีขาว */
+    /* 1. เปลี่ยนพื้นหลังของแอปทั้งหมดเป็นสีเทาดำ และเปลี่ยนสีตัวอักษรหลักเป็นสีขาว */
     .stApp {
         background-color: #0E1117 !important;
         color: #FFFFFF !important;
     }
     
-    /* 2. บังคับฟอนต์ Sarabun และตั้งค่าระยะบรรทัด (Line Height) ป้องกันข้อความซ้อน */
-    html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span, label {
+    /* 2. บังคับฟอนต์ Sarabun และตั้งค่าระยะบรรทัดมาตรฐานทั่วไป */
+    html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span {
         font-family: 'Sarabun', sans-serif !important;
         line-height: 1.6 !important;
     }
     
-    /* 3. ตกแต่งกล่องอัปโหลดไฟล์ (File Uploader) ให้เข้ากับธีมสีดำ */
+    /* 3. ล็อกระยะบรรทัดและฟอนต์สำหรับกล่องอัปโหลดไฟล์ (File Uploader) แยกต่างหาก ป้องกันการซ้อนทับ */
     [data-testid="stFileUploader"] {
         background-color: #1F2937 !important;
         border: 2px dashed #4B5563 !important;
         border-radius: 10px !important;
-        padding: 20px !important;
+        padding: 25px !important;
     }
     [data-testid="stFileUploader"] label {
         color: #F3F4F6 !important;
+        font-family: 'Sarabun', sans-serif !important;
         font-size: 16px !important;
         font-weight: 600 !important;
-        margin-bottom: 10px !important;
+        line-height: 1.8 !important; /* เพิ่มพื้นที่ด้านล่างหัวข้อ */
+        margin-bottom: 12px !important;
+        display: block !important;
     }
-    [data-testid="stFileUploader"] p {
-        color: #9CA3AF !important;
+    [data-testid="stFileUploader"] section {
+        padding: 10px 0px !important;
+    }
+    /* ดึงข้อความบอกขนาดไฟล์และปุ่มกดอัปโหลดไม่ให้เบียดกัน */
+    [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] p {
+        font-family: 'Sarabun', sans-serif !important;
+        line-height: 1.5 !important;
     }
     
     /* 4. ตกแต่งปุ่มกดวิเคราะห์ผล */
@@ -56,6 +64,7 @@ st.markdown("""
         border-radius: 8px !important;
         padding: 10px 20px !important;
         font-weight: 600 !important;
+        font-family: 'Sarabun', sans-serif !important;
         transition: 0.3s !important;
     }
     .stButton>button:hover {
@@ -63,10 +72,10 @@ st.markdown("""
         box-shadow: 0 0 10px rgba(37, 99, 235, 0.5) !important;
     }
     
-    /* 5. จัดการความสวยงามของหัวข้อหลัก */
+    /* 5. จัดการความสวยงามของหัวข้อหลัก (ตัด v3 ออกตามบรีฟ) */
     .main-title {
         font-weight: 700;
-        color: #3B82F6; /* สีฟ้าสว่างตัดกับพื้นหลังสีดำ */
+        color: #3B82F6; 
         text-align: center;
         margin-bottom: 5px;
     }
@@ -87,8 +96,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# เรียกใช้หน้าตาแอปสไตล์ดาร์กโมด
-st.markdown("<h1 class='main-title'>🔬 BacWise v3</h1>", unsafe_allow_html=True)
+# เรียกใช้หน้าตาแอปสไตล์ดาร์กโมด (ตัด v3 ออกเรียบร้อย)
+st.markdown("<h1 class='main-title'>🔬 BacWise</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ระบบปัญญาประดิษฐ์จำแนกสัณฐานและสีย้อมแกรมแบคทีเรียอัตโนมัติ</p>", unsafe_allow_html=True)
 st.markdown("---")
 
@@ -185,12 +194,12 @@ if uploaded_file is not None:
                 res_color = "Gram-Positive"
                 res_sub = "ติดสีม่วง (Purple)"
                 conf_color = raw_color_val
-                color_theme = "#A855F7"  # ปรับเป็นสีม่วงนีออนสว่างขึ้นเล็กน้อยเพื่อให้เด่นบนพื้นหลังดำ
+                color_theme = "#A855F7"  
             else:
                 res_color = "Gram-Negative"
                 res_sub = "ติดสีชมพู/แดง (Pink)"
                 conf_color = 1 - raw_color_val
-                color_theme = "#F43F5E"  # ปรับเป็นสีชมพูสว่างขึ้นเล็กน้อยเพื่อให้เด่นบนพื้นหลังดำ
+                color_theme = "#F43F5E"  
                 
             if conf_color < THRESHOLD_COLOR:
                 st.error("🎨 **ข้อจำกัดในการวิเคราะห์**\n\nระบบไม่สามารถระบุสีแกรมได้ เนื่องจากเฉดสีมีความเพี้ยน")
