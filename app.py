@@ -14,39 +14,19 @@ st.set_page_config(
     layout="centered"
 )
 
-# 🎨 CSS ตัดปัญหาตัวหนังสือซ้อนเด็ดขาด โดยการซ่อนคำว่า Browse files/Upload บนปุ่มทิ้งไปเลย
+# 🛑 🛠️ ไม้ตายปิดบล็อก: ส่งแท็กคำสั่งบอกบราวเซอร์ว่า "ห้ามแปลภาษาหน้าเว็บนี้เด็ดขาด" 
+# และปรับแต่งฟอนต์สารบรรณแบบคลีน ไม่ยุ่งกับปุ่ม เพื่อไม่ให้เกิดเลเยอร์หลอกตา
 st.markdown("""
+    <meta name="google" content="notranslate" />
+    
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
     
-    html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span {
+    html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span, button, label {
         font-family: 'Sarabun', sans-serif !important;
     }
     
-    /* 🎯 ไม้ตายแก้ปุ่มซ้อน: ซ่อนข้อความดั้งเดิมบนปุ่มอัปโหลดทิ้งไปเพื่อไม่ให้บราวเซอร์แปลซ้อน */
-    [data-testid="stFileUploader"] button {
-        color: transparent !important;
-        background-color: #EFF6FF !important;
-        border: 1px solid #BFDBFE !important;
-        position: relative !important;
-        width: 120px !important;
-        height: 40px !important;
-    }
-    
-    /* สลักคำว่า "เลือกไฟล์" หรือใส่สัญลักษณ์เข้าไปแทนที่แบบ Fix ตายตัว ไม่สะดุ้งตามระบบแปลภาษา */
-    [data-testid="stFileUploader"] button::after {
-        content: "📁 เลือกไฟล์" !important;
-        color: #1E40AF !important;
-        position: absolute !important;
-        left: 50% !important;
-        top: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        font-family: 'Sarabun', sans-serif !important;
-        font-weight: 600 !important;
-        font-size: 14px !important;
-        white-space: nowrap !important;
-    }
-    
+    /* จัดแต่งข้อความหัวข้อหลัก */
     .main-title {
         font-weight: 700;
         color: #1E3A8A; 
@@ -62,6 +42,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# ส่วนหัวข้อเว็บหลัก
 st.markdown("<h1 class='main-title'>🔬 BacWise</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ระบบปัญญาประดิษฐ์จำแนกสัณฐานและสีย้อมแกรมแบคทีเรียอัตโนมัติ</p>", unsafe_allow_html=True)
 st.markdown("---")
