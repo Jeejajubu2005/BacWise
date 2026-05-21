@@ -6,7 +6,7 @@ import gdown
 import os
 
 # ==============================================================================
-# 1. ตั้งค่าหน้าเว็บและปรับแต่งหน้าตา (CSS Injection)
+# 1. ตั้งค่าหน้าเว็บและปรับแต่งหน้าตา (Dark Mode & Font Style)
 # ==============================================================================
 st.set_page_config(
     page_title="BacWise - Bacterial Classification",
@@ -14,38 +14,80 @@ st.set_page_config(
     layout="centered"
 )
 
-# 🎨 ใส่ CSS เพื่อเปลี่ยนฟอนต์ไทยให้ละมุนตา จัดเลย์เอาต์ให้สวยงามขึ้น
+# 🎨 จัดการ CSS เปลี่ยนหน้าเว็บเป็นสีดำ และแก้บั๊กข้อความซ้อนทับ
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
     
-    /* เปลี่ยนฟอนต์ทั้งหน้าเว็บ */
-    html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span {
+    /* 1. เปลี่ยนพื้นหลังของแอปทั้งหมดเป็นสีดำ/เทาเข้ม และเปลี่ยนสีตัวอักษรหลักเป็นสีขาว */
+    .stApp {
+        background-color: #0E1117 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* 2. บังคับฟอนต์ Sarabun และตั้งค่าระยะบรรทัด (Line Height) ป้องกันข้อความซ้อน */
+    html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span, label {
         font-family: 'Sarabun', sans-serif !important;
+        line-height: 1.6 !important;
     }
     
-    /* ตกแต่งกล่องข้อความเตือนให้ดูนุ่มนวลขึ้น */
-    .stAlert {
-        border-radius: 10px;
+    /* 3. ตกแต่งกล่องอัปโหลดไฟล์ (File Uploader) ให้เข้ากับธีมสีดำ */
+    [data-testid="stFileUploader"] {
+        background-color: #1F2937 !important;
+        border: 2px dashed #4B5563 !important;
+        border-radius: 10px !important;
+        padding: 20px !important;
+    }
+    [data-testid="stFileUploader"] label {
+        color: #F3F4F6 !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        margin-bottom: 10px !important;
+    }
+    [data-testid="stFileUploader"] p {
+        color: #9CA3AF !important;
     }
     
-    /* จัดการความสวยงามของหัวข้อหลัก */
+    /* 4. ตกแต่งปุ่มกดวิเคราะห์ผล */
+    .stButton>button {
+        background-color: #2563EB !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 10px 20px !important;
+        font-weight: 600 !important;
+        transition: 0.3s !important;
+    }
+    .stButton>button:hover {
+        background-color: #1D4ED8 !important;
+        box-shadow: 0 0 10px rgba(37, 99, 235, 0.5) !important;
+    }
+    
+    /* 5. จัดการความสวยงามของหัวข้อหลัก */
     .main-title {
         font-weight: 700;
-        color: #1E3A8A;
+        color: #3B82F6; /* สีฟ้าสว่างตัดกับพื้นหลังสีดำ */
         text-align: center;
         margin-bottom: 5px;
     }
     .sub-title {
-        color: #4B5563;
+        color: #9CA3AF;
         text-align: center;
         font-weight: 400;
         margin-bottom: 25px;
     }
+    
+    /* 6. ตกแต่งกล่อง Metric (ผลลัพธ์) ฝั่งสีดำ */
+    [data-testid="stMetricValue"] {
+        color: #FFFFFF !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #9CA3AF !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# ใช้คลาส CSS ที่เราสร้างไว้ด้านบน
+# เรียกใช้หน้าตาแอปสไตล์ดาร์กโมด
 st.markdown("<h1 class='main-title'>🔬 BacWise v3</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ระบบปัญญาประดิษฐ์จำแนกสัณฐานและสีย้อมแกรมแบคทีเรียอัตโนมัติ</p>", unsafe_allow_html=True)
 st.markdown("---")
@@ -95,7 +137,6 @@ if uploaded_file is not None:
     image_display = Image.open(uploaded_file)
     st.image(image_display, caption="🖼️ ภาพถ่ายแบคทีเรียที่นำเข้าสู่ระบบ", use_container_width=True)
     
-    # ปุ่มกดสั่งเริ่มประมวลผล (ใช้คอลัมน์ช่วยจัดให้ปุ่มอยู่ตรงกลางสวย ๆ)
     col_btn_1, col_btn_2, col_btn_3 = st.columns([1,2,1])
     with col_btn_2:
         start_analysis = st.button("🔬 เริ่มทำการวิเคราะห์ทางจุลชีววิทยา", use_container_width=True)
@@ -119,7 +160,6 @@ if uploaded_file is not None:
 
         st.markdown("### 📊 ผลการวิเคราะห์จากระบบ")
         
-        # ใช้ระบบคอลัมน์ (Columns) จัดการแสดงผล ซ้าย-ขวา ให้ดูโปร เป็นระเบียบ ไม่ยาวพืด
         col_res1, col_res2 = st.columns(2)
         
         # 🟢 4.1 วิเคราะห์ฝั่งรูปร่าง (คอลัมน์ซ้าย)
@@ -145,22 +185,22 @@ if uploaded_file is not None:
                 res_color = "Gram-Positive"
                 res_sub = "ติดสีม่วง (Purple)"
                 conf_color = raw_color_val
-                color_theme = "#8A2BE2"  
+                color_theme = "#A855F7"  # ปรับเป็นสีม่วงนีออนสว่างขึ้นเล็กน้อยเพื่อให้เด่นบนพื้นหลังดำ
             else:
                 res_color = "Gram-Negative"
                 res_sub = "ติดสีชมพู/แดง (Pink)"
                 conf_color = 1 - raw_color_val
-                color_theme = "#FF69B4"  
+                color_theme = "#F43F5E"  # ปรับเป็นสีชมพูสว่างขึ้นเล็กน้อยเพื่อให้เด่นบนพื้นหลังดำ
                 
             if conf_color < THRESHOLD_COLOR:
                 st.error("🎨 **ข้อจำกัดในการวิเคราะห์**\n\nระบบไม่สามารถระบุสีแกรมได้ เนื่องจากเฉดสีมีความเพี้ยน")
             else:
                 st.markdown(f"<h2 style='color: {color_theme}; margin-bottom: 0px;'>{res_color}</h2>", unsafe_allow_html=True)
-                st.markdown(f"<p style='color: gray; font-size: 14px;'>{res_sub}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p style='color: #9CA3AF; font-size: 14px;'>{res_sub}</p>", unsafe_allow_html=True)
                 st.caption(f"ความมั่นใจของ AI: {conf_color*100:.2f}%")
 
 # ==============================================================================
-# 5. ฟุตเตอร์ลิขสิทธิ์ (บรรทัดเดียว คลีน ๆ)
+# 5. ฟุตเตอร์ลิขสิทธิ์
 # ==============================================================================
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: gray; font-size: 12px;'>© 2026 BacWise Project. All Rights Reserved. (Private Repository Protected)</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #6B7280; font-size: 12px;'>© 2026 BacWise Project. All Rights Reserved. (Private Repository Protected)</p>", unsafe_allow_html=True)
