@@ -24,8 +24,8 @@ st.markdown("---")
 @st.cache_resource
 def load_models():
     # ✨ แก้ไขแล้ว: ใส่เฉพาะ File ID ที่แกะออกมาจากลิงก์ของคุณเรียบร้อยแล้วครับ
-    shape_id = '19xrNgp3STE2jx9odn-lAR1NSpMoFh2lm'
-    color_id = '1XmLffNESJMIJ6kgtqLQlAXE5BTtf6r0w'
+    shape_id = '19xrNgp3STE2jx9odn-lAR1NSpMoFh2lm/view?usp=sharing'
+    color_id = '1XmLffNESJMIJ6kgtqLQlAXE5BTtf6r0w/view?usp=sharing'
     
     url_shape = f'https://docs.google.com/uc?export=download&id={shape_id}'
     url_color = f'https://docs.google.com/uc?export=download&id={color_id}'
