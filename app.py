@@ -6,7 +6,7 @@ import gdown
 import os
 
 # ==============================================================================
-# 1. ตั้งค่าหน้าเว็บสไตล์แอปพลิเคชันทางการแพทย์
+# 1. ตั้งค่าหน้าเว็บสไตล์แอปพลิเคชันทางการแพทย์ (ธีมสว่างดั้งเดิม)
 # ==============================================================================
 st.set_page_config(
     page_title="BacWise - Bacterial Classification",
@@ -14,52 +14,40 @@ st.set_page_config(
     layout="centered"
 )
 
-# 🎨 ใช้ CSS แบบคลีนเพื่อเปลี่ยนสีพื้นหลังและฟอนต์เฉพาะจุด เลี่ยงการแตะโครงสร้างปุ่มอัปโหลดตรงๆ
+# 🎨 ใช้ CSS ปรับฟอนต์ภาษาไทย และบังคับให้ตัวอักษรปุ่ม Upload เป็นสีดำเข้ม
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
     
-    /* ปรับพื้นหลังและฟอนต์รวมของแอป */
-    .stApp {
-        background-color: #0E1117 !important;
-        color: #FFFFFF !important;
-    }
-    
+    /* บังคับฟอนต์ Sarabun สำหรับตัวหนังสือทั่วไป */
     html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span {
         font-family: 'Sarabun', sans-serif !important;
     }
     
-    /* จัดแต่งข้อความหัวข้อหลักให้สวยงามโดดเด่น */
+    /* 🎯 แก้ไขบั๊กตัวอักษรซ้อน: บังคับให้ตัวอักษรบนปุ่ม Upload ดั้งเดิมเป็นสีดำเข้มและชัดเจน */
+    [data-testid="stFileUploader"] button {
+        color: #000000 !important;
+        font-family: 'Sarabun', sans-serif !important;
+        font-weight: 600 !important;
+    }
+    
+    /* จัดแต่งข้อความหัวข้อหลัก */
     .main-title {
         font-weight: 700;
-        color: #3B82F6; 
+        color: #1E3A8A; /* สีน้ำเงินเข้มสไตล์การแพทย์ */
         text-align: center;
         margin-bottom: 5px;
-        font-family: 'Sarabun', sans-serif !important;
     }
     .sub-title {
-        color: #9CA3AF;
+        color: #4B5563;
         text-align: center;
         font-weight: 400;
         margin-bottom: 25px;
-        font-family: 'Sarabun', sans-serif !important;
-    }
-    
-    /* ตกแต่งระยะห่างปุ่มวิเคราะห์ผลให้กดง่ายขึ้น */
-    .stButton>button {
-        background-color: #2563EB !important;
-        color: white !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        padding: 10px 20px !important;
-    }
-    .stButton>button:hover {
-        background-color: #1D4ED8 !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ส่วนหัวข้อเว็บหลัก (ตัด v3 ออกตามบรีฟเรียบร้อยครับ)
+# ส่วนหัวข้อเว็บหลัก (เหลือเฉพาะชื่อ BacWise คลีน ๆ)
 st.markdown("<h1 class='main-title'>🔬 BacWise</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ระบบปัญญาประดิษฐ์จำแนกสัณฐานและสีย้อมแกรมแบคทีเรียอัตโนมัติ</p>", unsafe_allow_html=True)
 st.markdown("---")
@@ -157,18 +145,18 @@ if uploaded_file is not None:
                 res_color = "Gram-Positive"
                 res_sub = "ติดสีม่วง (Purple)"
                 conf_color = raw_color_val
-                color_theme = "#A855F7"  
+                color_theme = "#8A2BE2"  
             else:
                 res_color = "Gram-Negative"
                 res_sub = "ติดสีชมพู/แดง (Pink)"
                 conf_color = 1 - raw_color_val
-                color_theme = "#F43F5E"  
+                color_theme = "#FF69B4"  
                 
             if conf_color < THRESHOLD_COLOR:
                 st.error("🎨 **ข้อจำกัดในการวิเคราะห์**\n\nระบบไม่สามารถระบุสีแกรมได้ เนื่องจากเฉดสีมีความเพี้ยน")
             else:
                 st.markdown(f"<h2 style='color: {color_theme}; margin-bottom: 0px;'>{res_color}</h2>", unsafe_allow_html=True)
-                st.markdown(f"<p style='color: #9CA3AF; font-size: 14px;'>{res_sub}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p style='color: #4B5563; font-size: 14px;'>{res_sub}</p>", unsafe_allow_html=True)
                 st.caption(f"ความมั่นใจของ AI: {conf_color*100:.2f}%")
 
 # ==============================================================================
