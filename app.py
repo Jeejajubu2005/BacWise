@@ -14,27 +14,42 @@ st.set_page_config(
     layout="centered"
 )
 
-# 🎨 ใช้ CSS ปรับฟอนต์ภาษาไทย และบังคับให้ตัวอักษรปุ่ม Upload เป็นสีดำเข้ม
+# 🎨 CSS ตัดปัญหาตัวหนังสือซ้อนเด็ดขาด โดยการซ่อนคำว่า Browse files/Upload บนปุ่มทิ้งไปเลย
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
     
-    /* บังคับฟอนต์ Sarabun สำหรับตัวหนังสือทั่วไป */
     html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span {
         font-family: 'Sarabun', sans-serif !important;
     }
     
-    /* 🎯 แก้ไขบั๊กตัวอักษรซ้อน: บังคับให้ตัวอักษรบนปุ่ม Upload ดั้งเดิมเป็นสีดำเข้มและชัดเจน */
+    /* 🎯 ไม้ตายแก้ปุ่มซ้อน: ซ่อนข้อความดั้งเดิมบนปุ่มอัปโหลดทิ้งไปเพื่อไม่ให้บราวเซอร์แปลซ้อน */
     [data-testid="stFileUploader"] button {
-        color: #000000 !important;
-        font-family: 'Sarabun', sans-serif !important;
-        font-weight: 600 !important;
+        color: transparent !important;
+        background-color: #EFF6FF !important;
+        border: 1px solid #BFDBFE !important;
+        position: relative !important;
+        width: 120px !important;
+        height: 40px !important;
     }
     
-    /* จัดแต่งข้อความหัวข้อหลัก */
+    /* สลักคำว่า "เลือกไฟล์" หรือใส่สัญลักษณ์เข้าไปแทนที่แบบ Fix ตายตัว ไม่สะดุ้งตามระบบแปลภาษา */
+    [data-testid="stFileUploader"] button::after {
+        content: "📁 เลือกไฟล์" !important;
+        color: #1E40AF !important;
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        font-family: 'Sarabun', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    
     .main-title {
         font-weight: 700;
-        color: #1E3A8A; /* สีน้ำเงินเข้มสไตล์การแพทย์ */
+        color: #1E3A8A; 
         text-align: center;
         margin-bottom: 5px;
     }
@@ -47,7 +62,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ส่วนหัวข้อเว็บหลัก (เหลือเฉพาะชื่อ BacWise คลีน ๆ)
 st.markdown("<h1 class='main-title'>🔬 BacWise</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ระบบปัญญาประดิษฐ์จำแนกสัณฐานและสีย้อมแกรมแบคทีเรียอัตโนมัติ</p>", unsafe_allow_html=True)
 st.markdown("---")
@@ -77,11 +91,11 @@ def load_models():
     return model_shape, model_color
 
 try:
-    with st.spinner("🔄 ระบบกำลังโหลดโมเดลอัจฉริยะ (ขั้นตอนนี้อาจใช้เวลา 1-2 นาทีในครั้งแรก)..."):
+    with st.spinner("🔄 ระบบกำลังโหลดโมเดลอัจฉริยะ..."):
         model_shape, model_color = load_models()
     st.success("✅ โหลดโมเดลระบบหลักเรียบร้อยแล้ว! พร้อมทำการวิเคราะห์")
 except Exception as e:
-    st.error("❌ ดึงข้อมูลล้มเหลว โปรดตรวจสอบสิทธิ์การแชร์ลิงก์ใน Google Drive ให้เป็น 'Anyone with the link'")
+    st.error("❌ ดึงข้อมูลล้มเหลว โปรดตรวจสอบสิทธิ์การแชร์ลิงก์ใน Google Drive")
 
 shape_labels = ['Bacilli', 'Cocci', 'Spirals']
 
@@ -122,7 +136,6 @@ if uploaded_file is not None:
         
         col_res1, col_res2 = st.columns(2)
         
-        # 🟢 4.1 วิเคราะห์ฝั่งรูปร่าง (คอลัมน์ซ้าย)
         with col_res1:
             st.markdown("#### 🧬 สัณฐานวิทยา (Shape)")
             pred_shape = model_shape.predict(img_tensor)
@@ -135,7 +148,6 @@ if uploaded_file is not None:
                 st.metric(label="Bacterial Shape", value=res_shape)
                 st.caption(f"ความมั่นใจของ AI: {conf_shape*100:.2f}%")
                 
-        # 🔵 4.2 วิเคราะห์ฝั่งสีแกรม (คอลัมน์ขวา)
         with col_res2:
             st.markdown("#### 🎨 ผลสีย้อมแกรม (Gram)")
             pred_color = model_color.predict(img_tensor)
