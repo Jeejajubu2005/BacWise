@@ -6,7 +6,7 @@ import gdown
 import os
 
 # ==============================================================================
-# 1. ตั้งค่าหน้าเว็บและปรับแต่งหน้าตา (Dark Mode & Advanced Layout)
+# 1. ตั้งค่าหน้าเว็บสไตล์แอปพลิเคชันทางการแพทย์
 # ==============================================================================
 st.set_page_config(
     page_title="BacWise - Bacterial Classification",
@@ -14,89 +14,52 @@ st.set_page_config(
     layout="centered"
 )
 
-# 🎨 จัดการ CSS แบบเจาะลึกเพื่อแก้ปัญหาตัวหนังสือซ้อนทับตรงส่วนอัปโหลดโดยเฉพาะ
+# 🎨 ใช้ CSS แบบคลีนเพื่อเปลี่ยนสีพื้นหลังและฟอนต์เฉพาะจุด เลี่ยงการแตะโครงสร้างปุ่มอัปโหลดตรงๆ
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
     
-    /* 1. เปลี่ยนพื้นหลังของแอปทั้งหมดเป็นสีเทาดำ และเปลี่ยนสีตัวอักษรหลักเป็นสีขาว */
+    /* ปรับพื้นหลังและฟอนต์รวมของแอป */
     .stApp {
         background-color: #0E1117 !important;
         color: #FFFFFF !important;
     }
     
-    /* 2. บังคับฟอนต์ Sarabun และตั้งค่าระยะบรรทัดมาตรฐานทั่วไป */
     html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span {
         font-family: 'Sarabun', sans-serif !important;
-        line-height: 1.6 !important;
     }
     
-    /* 3. ล็อกระยะบรรทัดและฟอนต์สำหรับกล่องอัปโหลดไฟล์ (File Uploader) แยกต่างหาก ป้องกันการซ้อนทับ */
-    [data-testid="stFileUploader"] {
-        background-color: #1F2937 !important;
-        border: 2px dashed #4B5563 !important;
-        border-radius: 10px !important;
-        padding: 25px !important;
-    }
-    [data-testid="stFileUploader"] label {
-        color: #F3F4F6 !important;
-        font-family: 'Sarabun', sans-serif !important;
-        font-size: 16px !important;
-        font-weight: 600 !important;
-        line-height: 1.8 !important; /* เพิ่มพื้นที่ด้านล่างหัวข้อ */
-        margin-bottom: 12px !important;
-        display: block !important;
-    }
-    [data-testid="stFileUploader"] section {
-        padding: 10px 0px !important;
-    }
-    /* ดึงข้อความบอกขนาดไฟล์และปุ่มกดอัปโหลดไม่ให้เบียดกัน */
-    [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] p {
-        font-family: 'Sarabun', sans-serif !important;
-        line-height: 1.5 !important;
-    }
-    
-    /* 4. ตกแต่งปุ่มกดวิเคราะห์ผล */
-    .stButton>button {
-        background-color: #2563EB !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-        padding: 10px 20px !important;
-        font-weight: 600 !important;
-        font-family: 'Sarabun', sans-serif !important;
-        transition: 0.3s !important;
-    }
-    .stButton>button:hover {
-        background-color: #1D4ED8 !important;
-        box-shadow: 0 0 10px rgba(37, 99, 235, 0.5) !important;
-    }
-    
-    /* 5. จัดการความสวยงามของหัวข้อหลัก (ตัด v3 ออกตามบรีฟ) */
+    /* จัดแต่งข้อความหัวข้อหลักให้สวยงามโดดเด่น */
     .main-title {
         font-weight: 700;
         color: #3B82F6; 
         text-align: center;
         margin-bottom: 5px;
+        font-family: 'Sarabun', sans-serif !important;
     }
     .sub-title {
         color: #9CA3AF;
         text-align: center;
         font-weight: 400;
         margin-bottom: 25px;
+        font-family: 'Sarabun', sans-serif !important;
     }
     
-    /* 6. ตกแต่งกล่อง Metric (ผลลัพธ์) ฝั่งสีดำ */
-    [data-testid="stMetricValue"] {
-        color: #FFFFFF !important;
+    /* ตกแต่งระยะห่างปุ่มวิเคราะห์ผลให้กดง่ายขึ้น */
+    .stButton>button {
+        background-color: #2563EB !important;
+        color: white !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        padding: 10px 20px !important;
     }
-    [data-testid="stMetricLabel"] {
-        color: #9CA3AF !important;
+    .stButton>button:hover {
+        background-color: #1D4ED8 !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# เรียกใช้หน้าตาแอปสไตล์ดาร์กโมด (ตัด v3 ออกเรียบร้อย)
+# ส่วนหัวข้อเว็บหลัก (ตัด v3 ออกตามบรีฟเรียบร้อยครับ)
 st.markdown("<h1 class='main-title'>🔬 BacWise</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ระบบปัญญาประดิษฐ์จำแนกสัณฐานและสีย้อมแกรมแบคทีเรียอัตโนมัติ</p>", unsafe_allow_html=True)
 st.markdown("---")
