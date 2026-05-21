@@ -129,4 +129,4 @@ if uploaded_file is not None:
 # 5. ฟุตเตอร์ลิขสิทธิ์
 # ==============================================================================
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: gray;'>© 2026 BacWise Project. All Rights Reserved. (Private Repository Protected)</p>", unsafe_allow_html=True)cWise Project. All Rights Reserved. (Private Repository Protected)</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: gray;'>© 2026 BacWise Project. All Rights Reserved. (Private Repository Protected)</p>", unsafe_allow_html=True)
