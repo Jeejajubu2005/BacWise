@@ -14,15 +14,13 @@ st.set_page_config(
     layout="centered"
 )
 
-# 🛑 🛠️ ไม้ตายปิดบล็อก: ส่งแท็กคำสั่งบอกบราวเซอร์ว่า "ห้ามแปลภาษาหน้าเว็บนี้เด็ดขาด" 
-# และปรับแต่งฟอนต์สารบรรณแบบคลีน ไม่ยุ่งกับปุ่ม เพื่อไม่ให้เกิดเลเยอร์หลอกตา
+# 🎨 ใช้ CSS แบบเจาะจงเฉพาะจุด (เลิกเหมารวมสาดทั่วเว็บ) เพื่อไม่ให้กระทบปุ่มอัปโหลดดั้งเดิม
 st.markdown("""
-    <meta name="google" content="notranslate" />
-    
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
     
-    html, body, [class*="css"], p, h1, h2, h3, h4, h5, h6, span, button, label {
+    /* เปลี่ยนฟอนต์เฉพาะส่วนเนื้อหาทั่วไปและหัวข้อที่เราสร้างขึ้นเองเท่านั้น */
+    .main-title, .sub-title, .section-heading, .result-text, p {
         font-family: 'Sarabun', sans-serif !important;
     }
     
@@ -39,10 +37,15 @@ st.markdown("""
         font-weight: 400;
         margin-bottom: 25px;
     }
+    .section-heading {
+        font-weight: 600;
+        color: #111827;
+        margin-top: 10px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# ส่วนหัวข้อเว็บหลัก
+# เรียกใช้คลาสเฉพาะจุดที่เราคุมสไตล์ไว้
 st.markdown("<h1 class='main-title'>🔬 BacWise</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ระบบปัญญาประดิษฐ์จำแนกสัณฐานและสีย้อมแกรมแบคทีเรียอัตโนมัติ</p>", unsafe_allow_html=True)
 st.markdown("---")
@@ -113,12 +116,12 @@ if uploaded_file is not None:
         THRESHOLD_SHAPE = 0.65  
         THRESHOLD_COLOR = 0.80  
 
-        st.markdown("### 📊 ผลการวิเคราะห์จากระบบ")
+        st.markdown("<h3 class='section-heading'>📊 ผลการวิเคราะห์จากระบบ</h3>", unsafe_allow_html=True)
         
         col_res1, col_res2 = st.columns(2)
         
         with col_res1:
-            st.markdown("#### 🧬 สัณฐานวิทยา (Shape)")
+            st.markdown("<h4 class='section-heading'>🧬 สัณฐานวิทยา (Shape)</h4>", unsafe_allow_html=True)
             pred_shape = model_shape.predict(img_tensor)
             conf_shape = np.max(pred_shape[0])
             res_shape = shape_labels[np.argmax(pred_shape[0])]
@@ -130,7 +133,7 @@ if uploaded_file is not None:
                 st.caption(f"ความมั่นใจของ AI: {conf_shape*100:.2f}%")
                 
         with col_res2:
-            st.markdown("#### 🎨 ผลสีย้อมแกรม (Gram)")
+            st.markdown("<h4 class='section-heading'>🎨 ผลสีย้อมแกรม (Gram)</h4>", unsafe_allow_html=True)
             pred_color = model_color.predict(img_tensor)
             raw_color_val = pred_color[0][0]
             
