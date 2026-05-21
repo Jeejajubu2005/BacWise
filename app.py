@@ -27,8 +27,9 @@ def load_models():
     shape_id = '19xrNgp3STE2jx9odn-lAR1NSpMoFh2lm'
     color_id = '1XmLffNESJMIJ6kgtqLQlAXE5BTtf6r0w'
     
-    url_shape = f'https://docs.google.com/uc?export=download&id={shape_id}'
-    url_color = f'https://docs.google.com/uc?export=download&id={color_id}'
+   # 🔄 เปลี่ยนวิธีสร้าง URL โหลดไฟล์ใหม่ (ก๊อปปี้ไปวางทับบรรทัด url_shape และ url_color ของเก่าได้เลย)
+    url_shape = f'https://drive.google.com/uc?id={shape_id}&export=download'
+    url_color = f'https://drive.google.com/uc?id={color_id}&export=download'
     
     # ดาวน์โหลดโมเดลรูปร่าง
     response_shape = requests.get(url_shape)
